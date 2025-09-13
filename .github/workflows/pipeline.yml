@@ -20,7 +20,8 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd /var/www/laravel             #${{ secrets.APP_DIR }}
+          cd /var/www/laravel             
+          # ${{ secrets.APP_DIR }}
           echo "Pulling latest changes"
           git pull origin main
           echo "Installing dependencies"
