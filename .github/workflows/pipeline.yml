@@ -20,17 +20,18 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd /var/www/laravel             
+          cd /var/www/laravel
+          pwd
           # ${{ secrets.APP_DIR }}
-          echo "Pulling latest changes"
-          git pull origin main
-          echo "Installing dependencies"
-          composer install --no-dev --optimize-autoloader
-          echo "Running migrations"
-          php artisan migrate --force
-          echo "Caching config and routes"
-          php artisan config:cache
-          php artisan route:cache
-          echo "Restarting web server"
-          sudo systemctl restart nginx
+          # echo "Pulling latest changes"
+          # git pull origin main
+          # echo "Installing dependencies"
+          # composer install --no-dev --optimize-autoloader
+          # echo "Running migrations"
+          # php artisan migrate --force
+          # echo "Caching config and routes"
+          # php artisan config:cache
+          # php artisan route:cache
+          # echo "Restarting web server"
+          # sudo systemctl restart nginx
         EOF
