@@ -1,4 +1,5 @@
-name: Deploy Laravel to EC2
+name: Deploy Static Site
+
 on:
   push:
     branches:
@@ -7,32 +8,25 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.5.4
+    - name: Copy files to server
+      uses: appleboy/scp-action@master
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "."
+        target: "/var/www/laravel"
 
-    - name: Deploy to EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+    - name: SSH into server and check files
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
           cd /var/www/laravel
-          pwd
-          git init
-          # ${{ secrets.APP_DIR }}
-          echo "Pulling latest changes"
-          git pull origin main
-          echo "Installing dependencies"
-          composer install --no-dev --optimize-autoloader
-          echo "Running migrations"
-          php artisan migrate --force
-          echo "Caching config and routes"
-          php artisan config:cache
-          php artisan route:cache
-          echo "Restarting web server"
-          sudo systemctl restart nginx
-        EOF
+          ls -la
